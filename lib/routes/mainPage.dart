@@ -14,7 +14,9 @@ class MainPage extends StatefulWidget {
 ToDo _database = new ToDo();
 List _data=[];
 int len = 0;
-
+double _height = 70;
+String l="";
+double y=0;
 
 List<Color> color = [
   Color.fromRGBO(255, 148, 174, 1),
@@ -42,7 +44,6 @@ class _MainPageState extends State<MainPage> {
   
   @override
   Widget build(BuildContext context) {
-    double height = MediaQuery.of(context).size.height * 0.1;
     _retrieveData();
 
     return MaterialApp(
@@ -57,11 +58,15 @@ class _MainPageState extends State<MainPage> {
         body: ListView.builder(
           itemCount: _data == null ? 0 : _data.length,
           itemBuilder: (c,i){
+           if(_height > MediaQuery.of(context).size.height*0.12){
+              l = _data[i]['content'];
+           }else{
+              l = _data[i]['name'];
+           }
             return Dismissible(
               key: Key("ads"),
               onDismissed: (d){
                 String s = _data[i]['name'];
-                
                 setState(() {
                   _database.deleteFromTODO(s);
                 });
@@ -69,24 +74,35 @@ class _MainPageState extends State<MainPage> {
               },
               child: InkWell(
                 onTap: (){
-                  return showDialog(
-                    context: context,
-                    barrierDismissible: true,
-                    builder: (BuildContext c){
-                      return AlertDialog(
-                        backgroundColor: color[_data[i]['color']],
-                        content: Text("${_data[i]['content']}"),
-                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
-                      );
+                  setState(() {
+                    if(_height==MediaQuery.of(context).size.height * 0.3){
+                      _height = MediaQuery.of(context).size.height * 0.1;
+                      y=0;
+                    }else{
+                      _height = MediaQuery.of(context).size.height * 0.3;
+                      y=-0.8;
                     }
-                  );
+                  });
+
+                  // return showDialog(
+                  //   context: context,
+                  //   barrierDismissible: true,
+                  //   builder: (BuildContext c){
+                  //     return AlertDialog(
+                  //       backgroundColor: color[_data[i]['color']],
+                  //       content: Text("${_data[i]['content']}"),
+                  //       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
+                  //     );
+                  //   }
+                  // );
                 },
-                child: Container(
-                  child:  Center(
-                    child: Text(_data[i]['name']),
+                child: AnimatedContainer(
+                  child:  Align(
+                    alignment: Alignment(-0.8, y),
+                    child: Text(l,style: TextStyle(fontSize: 20),),
                   ),
                   margin: EdgeInsets.all(5),
-                  height: height,
+                  height: _height,
                   decoration: BoxDecoration(
                     color: color[_data[i]['color']],
                     boxShadow: [
@@ -96,7 +112,7 @@ class _MainPageState extends State<MainPage> {
                         offset: Offset(5, 5),
                       ),
                     ],
-                  ),
+                  ), duration: Duration(seconds: 1),
                 ),
               ),
             );
